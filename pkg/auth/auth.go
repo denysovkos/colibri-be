@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"colibri/pkg/shared"
 	"fmt"
 	"strconv"
 	"strings"
@@ -11,12 +12,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var SECRET_KEY = "SecretYouShouldHide" // os.Getenv("API_SECRET")
+var SECRET_KEY = shared.GetEnv("API_SECRET_KEY", "SuperSecretDevKey")
+var PASS_ENC_KEY = shared.GetEnv("PASS_ENC_KEY", "MyDarkSecretDevKey")
 
 func GenerateHashedPassword(password string) string {
-	bytesPassword := []byte("MyDarkSecret")
-
-	hashedPassword, err := bcrypt.GenerateFromPassword(bytesPassword, bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(PASS_ENC_KEY), bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
 	}

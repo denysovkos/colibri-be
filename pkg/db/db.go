@@ -2,8 +2,8 @@ package db
 
 import (
 	"colibri/pkg/db/models"
+	"colibri/pkg/shared"
 	"log"
-	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,10 +20,7 @@ func Init() {
 
 func GetDBInstance() *gorm.DB {
 	if db == nil {
-		dbURL := "postgres://localhost:5432/colibri"
-		if os.Getenv("DATABASE_URL") != "" {
-			dbURL = os.Getenv("DATABASE_URL")
-		}
+		dbURL := shared.GetEnv("DATABASE_URL", "postgres://localhost:5432/colibri")
 
 		log.Println("Connecting to DB")
 		newDB, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
