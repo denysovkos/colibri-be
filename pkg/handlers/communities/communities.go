@@ -13,6 +13,7 @@ import (
 type CommunityRequestBody struct {
 	Name            string `json:"name"`
 	BackgroundImage string `json:"backgroundImage"`
+	Public          string `json:"public"`
 }
 
 func CreateCommunity(c *gin.Context) {
@@ -99,13 +100,9 @@ func UpdateCommunity(c *gin.Context) {
 	}
 
 	// Update the community fields
-	if updateCommunity.Name != "" {
-		community.Name = updateCommunity.Name
-	}
-
-	if updateCommunity.BackgroundImage != "" {
-		community.BackgroundImage = updateCommunity.BackgroundImage
-	}
+	community.Name = updateCommunity.Name
+	community.BackgroundImage = updateCommunity.BackgroundImage
+	community.Public = updateCommunity.Public
 
 	// Save the updated community
 	result = db.Save(&community)

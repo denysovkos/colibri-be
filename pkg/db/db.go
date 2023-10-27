@@ -19,6 +19,8 @@ func Init() {
 	log.Println("Migrating DB")
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Community{})
+	db.AutoMigrate(&models.Topic{})
+	db.AutoMigrate(&models.Comments{})
 	log.Println("✅  Migrated!")
 }
 

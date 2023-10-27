@@ -13,4 +13,5 @@ type User struct {
 	Avatar          string      `json:"avatar"`
 	BackgroundImage string      `json:"backgroundImage"`
 	Communities     []Community `gorm:"foreignkey:OwnerID"`
+	Comments        []Comments  `gorm:"foreignkey:UserID"`
 }
