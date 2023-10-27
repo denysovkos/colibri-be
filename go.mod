@@ -1,6 +1,6 @@
 module colibri
 
-go 1.21.2
+go 1.20.3
 
 require (
 	github.com/bytedance/sonic v1.10.2 // indirect
