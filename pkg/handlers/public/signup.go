@@ -40,7 +40,7 @@ func SignUp(c *gin.Context) {
 		BackgroundImage: requestBody.BackgroundImage,
 	}
 
-	result := db.Create(&user)
+	result := db.Debug().Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": result.Error,

@@ -4,6 +4,7 @@ import (
 	"colibri/pkg/db"
 	communities_handlers "colibri/pkg/handlers/communities"
 	public_handlers "colibri/pkg/handlers/public"
+	topic_handlers "colibri/pkg/handlers/topics"
 	user_handlers "colibri/pkg/handlers/users"
 	"colibri/pkg/middlewares"
 
@@ -28,28 +29,47 @@ func main() {
 	r.POST("/login", public_handlers.Login)
 
 	// PRIVATE
-	userRoutes := r.Group("/api")
-	userRoutes.Use(middlewares.JwtAuthMiddleware())
+	protectedRoutes := r.Group("/api")
+	protectedRoutes.Use(middlewares.JwtAuthMiddleware())
 	// get user
-	userRoutes.GET("/user", user_handlers.GetUser)
+	protectedRoutes.GET("/user", user_handlers.GetUser)
 	// update user
-	userRoutes.PUT("/user", user_handlers.UpdateUser)
+	protectedRoutes.PUT("/user", user_handlers.UpdateUser)
 	// delete user
-	userRoutes.DELETE("/user", user_handlers.DeleteUser)
+	protectedRoutes.DELETE("/user", user_handlers.DeleteUser)
 
 	// TODO: Entities
 	// COMMUNITY
 	// get all
-	userRoutes.GET("/community", communities_handlers.GetCommunities)
+	protectedRoutes.GET("/community", communities_handlers.GetCommunities)
 	// create
-	userRoutes.POST("/community", communities_handlers.CreateCommunity)
+	protectedRoutes.POST("/community", communities_handlers.CreateCommunity)
 	// update
-	userRoutes.PUT("/community/:id", communities_handlers.UpdateCommunity)
+	protectedRoutes.PUT("/community/:communityId", communities_handlers.UpdateCommunity)
 	// archive
-	userRoutes.DELETE("/community/:id", communities_handlers.SoftDeleteCommunity)
+	protectedRoutes.DELETE("/community/:communityId", communities_handlers.SoftDeleteCommunity)
 
 	// TOPIC
+	// get all
+	// route: GET /community/:id/topic
+	protectedRoutes.GET("/community/:communityId/topic", topic_handlers.GetTopics)
+
+	// get one (with comments)
+	// route: GET /community/:community-id/topic/:topic-id
+	protectedRoutes.GET("/community/:communityId/topic/:topicId", topic_handlers.GetTopic)
+
+	// create
+	// route: POST /community/:community-id/topic
+	protectedRoutes.POST("/community/:communityId/topic", topic_handlers.CreateTopic)
+
+	// update
+	// route: PUT /community/:community-id/topic/:topicId
+
+	// archive
+	// route: DELETE /community/:community-id/topic/:topicId
+
 	// COMMENT
+	// create
 
 	r.Run() // listen and serve on 0.0.0.0:8080
 }

@@ -4,7 +4,6 @@ import (
 	"colibri/pkg/auth"
 	"colibri/pkg/db"
 	"colibri/pkg/db/models"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -65,7 +64,6 @@ func GetCommunities(c *gin.Context) {
 
 	var communities []models.Community
 	// TODO: Add pagination
-	log.Println("Requesting owner id >> ", userId)
 	db.Debug().Where("owner_id = ?", userId).Find(&communities)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -83,7 +81,7 @@ func UpdateCommunity(c *gin.Context) {
 	db := db.GetDBInstance()
 
 	var community models.Community
-	communityID := c.Param("id")
+	communityID := c.Param("communityId")
 
 	// Check if the community exists
 	result := db.Where("id = ?", communityID).Where("owner_id = ?", userId).First(&community)
@@ -116,7 +114,7 @@ func UpdateCommunity(c *gin.Context) {
 
 func SoftDeleteCommunity(c *gin.Context) {
 	var community models.Community
-	communityID := c.Param("id")
+	communityID := c.Param("communityId")
 
 	db := db.GetDBInstance()
 	// Check if the community exists
