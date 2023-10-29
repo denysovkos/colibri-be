@@ -2,11 +2,13 @@ package main
 
 import (
 	"colibri/pkg/db"
+	comments_handlers "colibri/pkg/handlers/comments"
 	communities_handlers "colibri/pkg/handlers/communities"
 	public_handlers "colibri/pkg/handlers/public"
 	topic_handlers "colibri/pkg/handlers/topics"
 	user_handlers "colibri/pkg/handlers/users"
 	"colibri/pkg/middlewares"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,12 +23,26 @@ func main() {
 		})
 	})
 
-	// ROUTES
+	// UI Routes
+	r.LoadHTMLGlob("pkg/templates/**/*")
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "home/index.tmpl", gin.H{
+			"title": "Main website",
+		})
+	})
+	r.GET("/communities/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "communities/index.tmpl", gin.H{
+			"title": "Communities",
+		})
+	})
+
+	// API ROUTES
 	// PUBLIC
 	// signup
-	r.POST("/signup", public_handlers.SignUp)
+	publicRoutes := r.Group("/v1")
+	publicRoutes.POST("/signup", public_handlers.SignUp)
 	// login
-	r.POST("/login", public_handlers.Login)
+	publicRoutes.POST("/login", public_handlers.Login)
 
 	// PRIVATE
 	protectedRoutes := r.Group("/api")
@@ -64,12 +80,15 @@ func main() {
 
 	// update
 	// route: PUT /community/:community-id/topic/:topicId
+	protectedRoutes.PUT("/community/:communityId/topic/:topicId", topic_handlers.UpdateTopic)
 
 	// archive
 	// route: DELETE /community/:community-id/topic/:topicId
+	protectedRoutes.DELETE("/community/:communityId/topic/:topicId", topic_handlers.SoftDeleteTopic)
 
 	// COMMENT
 	// create
+	protectedRoutes.POST("/community/:communityId/topic/:topicId/message", comments_handlers.CreateComment)
 
 	r.Run() // listen and serve on 0.0.0.0:8080
 }

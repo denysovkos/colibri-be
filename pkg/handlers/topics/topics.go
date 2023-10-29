@@ -110,3 +110,85 @@ func CreateTopic(c *gin.Context) {
 		"result": result.RowsAffected > 0,
 	})
 }
+
+func UpdateTopic(c *gin.Context) {
+	userId, err := auth.ExtractTokenID(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	db := db.GetDBInstance()
+
+	var topic models.Topic
+
+	communityID := c.Param("communityId")
+	topicID := c.Param("topicId")
+
+	// Check if the topic exists
+	result := db.
+		Where("id = ?", topicID).
+		Where("community_id = ?", communityID).
+		Where("owner_id = ?", userId).
+		First(&topic)
+
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Topic not found"})
+		return
+	}
+
+	// Parse the request body into a struct representing the fields to update
+	var updateTopic models.Topic
+	if err := c.ShouldBindJSON(&updateTopic); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Update the community fields
+	topic.Name = updateTopic.Name
+	topic.Description = updateTopic.Description
+
+	// Save the updated topic
+	result = db.Save(&topic)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update topic"})
+		return
+	}
+
+	c.JSON(http.StatusOK, topic)
+}
+
+func SoftDeleteTopic(c *gin.Context) {
+	userId, err := auth.ExtractTokenID(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	var topic models.Topic
+
+	communityID := c.Param("communityId")
+	topicID := c.Param("topicId")
+
+	db := db.GetDBInstance()
+	// Check if the topic exists
+	result := db.
+		Where("id = ?", topicID).
+		Where("community_id = ?", communityID).
+		Where("owner_id = ?", userId).
+		First(&topic)
+
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "topic not found"})
+		return
+	}
+
+	// Soft delete the topic (set DeletedAt field)
+	result = db.Delete(&topic)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete topic"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "topic deleted successfully"})
+}
