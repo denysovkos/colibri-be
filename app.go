@@ -8,7 +8,6 @@ import (
 	topic_handlers "colibri/pkg/handlers/topics"
 	user_handlers "colibri/pkg/handlers/users"
 	"colibri/pkg/middlewares"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,19 +19,6 @@ func main() {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
-		})
-	})
-
-	// UI Routes
-	r.LoadHTMLGlob("pkg/templates/**/*")
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "home/index.tmpl", gin.H{
-			"title": "Main website",
-		})
-	})
-	r.GET("/communities/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "communities/index.tmpl", gin.H{
-			"title": "Communities",
 		})
 	})
 
